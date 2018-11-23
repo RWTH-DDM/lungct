@@ -46,7 +46,7 @@ segmentation[segmentation != 1] = 0
 
 # Display result
 scan_data = scan.get_fdata()
-mask_data = scan.get_fdata()
+mask_data = mask.get_fdata()
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 ax1.imshow(scan_data[scan_data.shape[0] // 2])
 ax1.set_title('Image')
