@@ -1,47 +1,18 @@
 
-import glob
-import os
-import nibabel as nib
 import matplotlib.pyplot as plt
-import numpy as np
-import scipy.ndimage as img
 
-
-# Read in paths of available data
-data_base_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
-
-image_files = glob.glob(os.path.join(data_base_path, 'IMG_*'))
-mask_files = [path.replace('IMG_', 'MASK_') for path in image_files]
-
-for mask_file in mask_files:
-    if not os.path.isfile(mask_file):
-        raise Exception("Missing mask file " + mask_file)
-
-print("Images found: %d" % len(image_files))
-
-if len(image_files) == 0:
-    raise Exception("No data found under " + data_base_path)
+from lungct.data import *
+from lungct.segmentation import *
 
 
 # Use first image
-scan = nib.load(image_files[0])
-mask = nib.load(mask_files[0])
+scan = get_image('0002')
+mask = get_mask('0002')
 
 print("Dimensions: " + str(scan.shape))
 
 
-# Thresholding yields point cloud within lung volume
-# Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
-segmentation = np.copy(scan.get_fdata())
-segmentation[(-950 < segmentation) & (segmentation < -701)] = 1
-segmentation[segmentation != 1] = 0
-
-
-# Smoothing using gaussian kernel and 2nd threshold to get solid volumes
-# todo: use otsu?
-segmentation = img.filters.gaussian_filter(segmentation, sigma=3)
-segmentation[segmentation > 0.1] = 1  # min 3 (3/27 =~ 0.11) lung-pixels per 3x3x3-cube
-segmentation[segmentation != 1] = 0
+segmentation = segment_lung(scan)
 
 
 # Display result
