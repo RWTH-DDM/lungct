@@ -5,7 +5,7 @@ import os
 import re
 
 
-_data_base_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'data'))
+_data_base_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 
 
 def get_image_ids():
