@@ -8,7 +8,7 @@ def flood_fill(data, start):
     shape = data.shape
     visited = np.zeros(shape, bool)
 
-    to_visit = set([start])
+    to_visit = {start}
 
     while to_visit:
 
