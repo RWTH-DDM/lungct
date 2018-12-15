@@ -1,4 +1,5 @@
 
+import time
 import lungct.data as data
 import lungct.segmentation as seg
 import matplotlib.pyplot as plt
@@ -10,7 +11,11 @@ mask = data.get_mask('0002')
 
 
 # Find lung
+print("Segmenting out lung...")
+start = time.time()
 segmentation = seg.segment_lung(scan)
+end = time.time()
+print("(Segmentation took %.2f seconds)" % (end - start))
 
 
 # Display result as central slice thru the scan, the given segmentation and the computed segmentation
