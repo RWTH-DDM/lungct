@@ -68,3 +68,7 @@ class LungCT:
 
         # return volume in mm^3
         return abs(p[0] * p[1] * p[2])
+
+    def get_percentile_density(self, percentile: float) -> float:
+
+        return np.nanpercentile(self.get_lung(), percentile)

@@ -7,6 +7,8 @@ from LungCT import LungCT
 lungct = LungCT(data.get_image_path('0002'))
 
 print("Volume: %f l" % lungct.get_volume())
+print("PD 5%% (HU): %f" % lungct.get_percentile_density(5))
+print("PD 95%% (HU): %f" % lungct.get_percentile_density(95))
 
 
 # Display result as central slice thru the scan, the given segmentation and the computed segmentation
