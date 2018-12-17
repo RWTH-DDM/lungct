@@ -51,7 +51,7 @@ class LungCT:
         }
 
         if unit not in unit_factors:
-            raise Exception("Unknown unit: %s" % unit[0])
+            raise Exception("Unknown unit: %s" % unit)
 
         # see http://nipy.org/nibabel/coordinate_systems.html#applying-the-affine
         affine = self._scan.get_affine()
