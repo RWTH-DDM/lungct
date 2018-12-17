@@ -12,7 +12,7 @@ scan = data.get_image('0002')
 # Find lung
 print("Segmenting out lung...")
 start = time.time()
-segmentation = seg.get_lung_mask(scan)
+mask = seg.get_lung_mask(scan)
 end = time.time()
 print("(Segmentation took %.2f seconds)" % (end - start))
 
@@ -21,10 +21,12 @@ print("(Segmentation took %.2f seconds)" % (end - start))
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
 scan_data = scan.get_fdata()
-ax1.imshow(scan_data[scan_data.shape[0] // 2])
+height = scan_data.shape[0] // 2
+
+ax1.imshow(scan_data[height])
 ax1.set_title('Image')
 
-ax2.imshow(segmentation[segmentation.shape[0] // 2])
-ax2.set_title('Segmentation')
+ax2.imshow(mask[height])
+ax2.set_title('Mask')
 
 fig.show()
