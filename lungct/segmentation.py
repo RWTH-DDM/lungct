@@ -18,28 +18,37 @@ def segment_lung(scan):
     segmentation[segmentation > 0.1] = 1  # min 3 (3/27 =~ 0.11) lung-pixels per 3x3x3-cube
     segmentation[segmentation != 1] = 0
 
-
     # Use floodfilling to reduce mask to actual parts of the lung
     # The filling is started on the two points where the central traverse axis first hits a thresholded area
-
     shape = scan.shape
+    result = np.zeros(shape, bool)
 
-    first_wing = None
-    for x in range(shape[2] // 2, shape[2] - 1):
+    limit = shape[2] - 1
+    for x in range(shape[2] // 2, limit):
+
         coordinates = (shape[0] // 2, shape[1] // 2, x)
-        if segmentation[coordinates] == 1:
-            first_wing = flood_fill(segmentation, coordinates)
-            break
-    if first_wing is None:
-        raise Exception("Could not find first lung wing")
 
-    second_wing = None
-    for x in range(shape[2] // 2, 0, -1):
+        if segmentation[coordinates] == 1:
+            flood_fill(segmentation, coordinates, result)
+            break
+
+        elif x == (limit - 1):
+            raise Exception("Could not find first lung wing")
+
+    limit = 0
+    for x in range(shape[2] // 2, limit, -1):
+
         coordinates = (shape[0] // 2, shape[1] // 2, x)
-        if segmentation[coordinates] == 1:
-            second_wing = flood_fill(segmentation, coordinates)
-            break
-    if second_wing is None:
-        raise Exception("Could not find second lung wing")
 
-    return np.logical_or(first_wing, second_wing)
+        if segmentation[coordinates] == 1:
+
+            # only fill if not already found by first flooding
+            if not result[coordinates]:
+                flood_fill(segmentation, coordinates, result)
+
+            break
+
+        elif x == (limit + 1):
+            raise Exception("Could not find second lung wing")
+
+    return result

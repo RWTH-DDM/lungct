@@ -3,10 +3,13 @@ import neighbourhood
 import numpy as np
 
 
-def flood_fill(data, start):
+def flood_fill(data, start, visited=None):
 
     shape = data.shape
-    visited = np.zeros(shape, bool)
+
+    # initialize target
+    if visited is None:
+        visited = np.zeros(shape, bool)
 
     # define neighbourhood function
     # if possible use a version optimized for some specific shape
