@@ -1,5 +1,5 @@
 
-from lungct.neighbourhood import get_neighbours
+import neighbourhood
 import numpy as np
 
 
@@ -8,15 +8,20 @@ def flood_fill(data, start):
     shape = data.shape
     visited = np.zeros(shape, bool)
 
-    to_visit = {start}
+    # define neighbourhood function
+    # if possible use a version optimized for some specific shape
+    neighbours = neighbourhood.get_neighbours
+    if len(shape) == 3:
+        neighbours = neighbourhood.get_neighbours_3d
 
+    to_visit = {start}
     while to_visit:
 
         current = to_visit.pop()
         visited[current] = True
 
         # add neighbors to queue
-        for neighbour in get_neighbours(shape, current):
+        for neighbour in neighbours(shape, current):
 
             if visited[neighbour]:
                 continue
