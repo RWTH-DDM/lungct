@@ -38,7 +38,7 @@ class LungCT:
 
     def get_volume(self) -> float:
 
-        return np.count_nonzero(self.get_mask()) * self.get_voxel_volume()
+        return np.count_nonzero(self.get_mask()) * self.get_voxel_volume() / 1000000.
 
     def get_voxel_volume(self) -> float:
 
@@ -59,4 +59,5 @@ class LungCT:
         p = m.dot([1., 1., 1.])
         p *= unit_factors[unit]
 
+        # return volume in mm^3
         return abs(p[0] * p[1] * p[2])

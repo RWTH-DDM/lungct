@@ -7,7 +7,7 @@ from LungCT import LungCT
 
 lungct = LungCT(data.get_image_path('0002'))
 
-print("Volume: %f l" % (lungct.get_volume() / 1000000.))
+print("Volume: %f l" % lungct.get_volume())
 
 
 # Display result as central slice thru the scan, the given segmentation and the computed segmentation
