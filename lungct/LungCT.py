@@ -36,6 +36,13 @@ class LungCT:
 
         return self._mask
 
+    def get_lung(self) -> np.array:
+
+        masked_data = np.copy(self.get_scan())
+        masked_data[~self.get_mask()] = np.nan
+
+        return masked_data
+
     def get_volume(self) -> float:
 
         return np.count_nonzero(self.get_mask()) * self.get_voxel_volume() / 1000000.
