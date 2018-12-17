@@ -4,7 +4,7 @@ import numpy as np
 import scipy.ndimage as img
 
 
-def segment_lung(scan):
+def get_lunk_mask(scan):
 
     # Thresholding yields point cloud within lung volume
     # Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
