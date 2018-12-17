@@ -12,7 +12,7 @@ scan = data.get_image('0002')
 # Find lung
 print("Segmenting out lung...")
 start = time.time()
-segmentation = seg.get_lunk_mask(scan)
+segmentation = seg.get_lung_mask(scan)
 end = time.time()
 print("(Segmentation took %.2f seconds)" % (end - start))
 
