@@ -4,11 +4,11 @@ import numpy as np
 import scipy.ndimage as img
 
 
-def get_lung_mask(scan):
+def get_lung_mask(scan_data):
 
     # Thresholding yields point cloud within lung volume
     # Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
-    segmentation = np.copy(scan.get_fdata())
+    segmentation = np.copy(scan_data)
     segmentation[(-950 < segmentation) & (segmentation < -701)] = 1
     segmentation[segmentation != 1] = 0
 
@@ -20,7 +20,7 @@ def get_lung_mask(scan):
 
     # Use floodfilling to reduce mask to actual parts of the lung
     # The filling is started on the two points where the central traverse axis first hits a thresholded area
-    shape = scan.shape
+    shape = scan_data.shape
     result = np.zeros(shape, bool)
 
     limit = shape[2] - 1

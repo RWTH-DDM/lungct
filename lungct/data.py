@@ -1,6 +1,5 @@
 
 import glob
-import nibabel as nib
 import os
 import re
 
@@ -20,7 +19,7 @@ def get_image_ids():
     return [re.search(r'IMG_(\d+)\.nii\.gz$', file_name).group(1) for file_name in image_files]
 
 
-def get_image(id):
+def get_image_path(id):
 
-    return nib.load(os.path.join(_data_base_path, 'IMG_' + id + '.nii.gz'))
+    return os.path.join(_data_base_path, 'IMG_' + id + '.nii.gz')
 

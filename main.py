@@ -1,27 +1,20 @@
 
-import time
 import lungct.data as data
-import lungct.segmentation as seg
 import matplotlib.pyplot as plt
 import numpy as np
+from LungCT import LungCT
 
 
-# Use first image
-scan = data.get_image('0002')
+lungct = LungCT(data.get_image_path('0002'))
 
-
-# Find lung
-print("Segmenting out lung...")
-start = time.time()
-mask = seg.get_lung_mask(scan)
-end = time.time()
-print("(Segmentation took %.2f seconds)" % (end - start))
+print("Volume: %f" % lungct.get_volume())
 
 
 # Display result as central slice thru the scan, the given segmentation and the computed segmentation
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 
-scan_data = scan.get_fdata()
+scan_data = lungct.get_scan()
+mask = lungct.get_mask()
 masked_data = np.copy(scan_data)
 masked_data[~mask] = 0.
 height = scan_data.shape[0] // 2
