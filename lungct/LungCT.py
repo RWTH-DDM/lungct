@@ -72,3 +72,11 @@ class LungCT:
     def get_percentile_density(self, percentile: float) -> float:
 
         return np.nanpercentile(self.get_lung(), percentile)
+
+    def get_average_density(self):
+
+        return np.nanmean(self.get_lung())
+
+    def get_median_density(self):
+
+        return np.nanmedian(self.get_lung())
