@@ -29,7 +29,3 @@ def get_image(id):
 
     return nib.load(os.path.join(_data_base_path, 'IMG_' + id + '.nii.gz'))
 
-
-def get_mask(id):
-
-    return nib.load(os.path.join(_data_base_path, 'MASK_' + id + '.nii.gz'))
