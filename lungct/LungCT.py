@@ -53,7 +53,7 @@ class LungCT:
 
         return masked_vessel.astype(bool)
 
-    def get_lung_without_vessel(self) -> np.array:
+    def get_lung_without_vessels(self) -> np.array:
 
         lung = np.copy(self.get_lung())
         lung[self.get_vessel_mask()] = np.nan
