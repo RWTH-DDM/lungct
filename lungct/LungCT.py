@@ -74,9 +74,11 @@ class LungCT:
             'mm': 1.
         }
 
-        if unit not in unit_factors:
+        # Assume mm for unknown dimension
+        if unit == 'unknown':
             unit = 'mm'
-            #raise Exception("Unknown unit: %s" % unit)
+        elif unit not in unit_factors:
+            raise Exception("Unknown unit: %s" % unit)
 
         # see http://nipy.org/nibabel/coordinate_systems.html#applying-the-affine
         affine = self._scan.get_affine()
