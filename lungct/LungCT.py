@@ -47,7 +47,7 @@ class LungCT:
 
         # Thresholding yields blood vessel point cloud within lung volume
         masked_vessel = np.copy(self.get_lung())
-        masked_vessel[masked_vessel == np.nan] = 0
+        masked_vessel[np.isnan(masked_vessel)] = 0
         masked_vessel[(-590 < masked_vessel) & (masked_vessel < -400)] = 1
         masked_vessel[masked_vessel != 1] = 0
 
