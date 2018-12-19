@@ -43,6 +43,23 @@ class LungCT:
 
         return masked_data
 
+    def get_vessel_mask(self) -> np.array:
+
+        # Thresholding yields blood vessel point cloud within lung volume
+        masked_vessel = np.copy(self.get_lung())
+        masked_vessel[masked_vessel == np.nan] = 0
+        masked_vessel[(-590 < masked_vessel) & (masked_vessel < -400)] = 1
+        masked_vessel[masked_vessel != 1] = 0
+
+        return masked_vessel.astype(bool)
+
+    def get_lung_without_vessel(self) -> np.array:
+
+        lung = np.copy(self.get_lung())
+        lung[self.get_vessel_mask()] = np.nan
+
+        return lung
+
     def get_volume(self) -> float:
 
         return np.count_nonzero(self.get_mask()) * self.get_voxel_volume() / 1000000.
@@ -58,7 +75,8 @@ class LungCT:
         }
 
         if unit not in unit_factors:
-            raise Exception("Unknown unit: %s" % unit)
+            unit = 'mm'
+            #raise Exception("Unknown unit: %s" % unit)
 
         # see http://nipy.org/nibabel/coordinate_systems.html#applying-the-affine
         affine = self._scan.get_affine()
