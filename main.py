@@ -14,6 +14,7 @@ print("PD 5%%: %f" % lung_with_vessels.get_percentile_density(5))
 print("PD 95%%: %f" % lung_with_vessels.get_percentile_density(95))
 print("Average: %f" % lung_with_vessels.get_average_density())
 print("Median: %f" % lung_with_vessels.get_median_density())
+print()
 
 print("Lung without vessels:")
 print("Volume: %f l" % lung_without_vessels.get_volume())
