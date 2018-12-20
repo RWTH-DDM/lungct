@@ -34,7 +34,56 @@ class LungCT:
 
         """ Returns boolean mask array which is True for all voxels being part of the lung. """
 
-        return self._numpy_cache.get_cached(self._get_lung_mask, self._scan_file_path, self.get_scan())
+        def compute_mask(scan_data):
+
+            # Thresholding yields point cloud within lung volume
+            # Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
+            segmentation = np.copy(scan_data)
+            segmentation[(-950 < segmentation) & (segmentation < -701)] = 1
+            segmentation[segmentation != 1] = 0
+
+            # Smoothing using gaussian kernel and 2nd threshold to get solid volumes
+            # todo: use otsu?
+            segmentation = img.filters.gaussian_filter(segmentation, sigma=3)
+            segmentation[segmentation > 0.1] = 1  # min 3 (3/27 =~ 0.11) lung-pixels per 3x3x3-cube
+            segmentation[segmentation != 1] = 0
+
+            # Use floodfilling to reduce mask to actual parts of the lung
+            # The filling is started on the two points where the central traverse axis first hits a thresholded area
+            shape = scan_data.shape
+            result = np.zeros(shape, bool)
+
+            limit = shape[2] - 1
+            for x in range(shape[2] // 2, limit):
+
+                coordinates = (shape[0] // 2, shape[1] // 2, x)
+
+                if segmentation[coordinates] == 1:
+                    flood_fill(segmentation, coordinates, result)
+                    break
+
+                elif x == (limit - 1):
+                    raise Exception("Could not find first lung wing")
+
+            limit = 0
+            for x in range(shape[2] // 2, limit, -1):
+
+                coordinates = (shape[0] // 2, shape[1] // 2, x)
+
+                if segmentation[coordinates] == 1:
+
+                    # only fill if not already found by first flooding
+                    if not result[coordinates]:
+                        flood_fill(segmentation, coordinates, result)
+
+                    break
+
+                elif x == (limit + 1):
+                    raise Exception("Could not find second lung wing")
+
+            return result
+
+        return self._numpy_cache.get_cached(compute_mask, self._scan_file_path, self.get_scan())
 
     def get_lung(self) -> np.array:
 
@@ -106,53 +155,3 @@ class LungCT:
     def get_median_density(self):
 
         return np.nanmedian(self.get_lung())
-
-    def _get_lung_mask(self, scan_data: np.array):
-
-        # Thresholding yields point cloud within lung volume
-        # Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
-        segmentation = np.copy(scan_data)
-        segmentation[(-950 < segmentation) & (segmentation < -701)] = 1
-        segmentation[segmentation != 1] = 0
-
-        # Smoothing using gaussian kernel and 2nd threshold to get solid volumes
-        # todo: use otsu?
-        segmentation = img.filters.gaussian_filter(segmentation, sigma=3)
-        segmentation[segmentation > 0.1] = 1  # min 3 (3/27 =~ 0.11) lung-pixels per 3x3x3-cube
-        segmentation[segmentation != 1] = 0
-
-        # Use floodfilling to reduce mask to actual parts of the lung
-        # The filling is started on the two points where the central traverse axis first hits a thresholded area
-        shape = scan_data.shape
-        result = np.zeros(shape, bool)
-
-        limit = shape[2] - 1
-        for x in range(shape[2] // 2, limit):
-
-            coordinates = (shape[0] // 2, shape[1] // 2, x)
-
-            if segmentation[coordinates] == 1:
-                flood_fill(segmentation, coordinates, result)
-                break
-
-            elif x == (limit - 1):
-                raise Exception("Could not find first lung wing")
-
-        limit = 0
-        for x in range(shape[2] // 2, limit, -1):
-
-            coordinates = (shape[0] // 2, shape[1] // 2, x)
-
-            if segmentation[coordinates] == 1:
-
-                # only fill if not already found by first flooding
-                if not result[coordinates]:
-                    flood_fill(segmentation, coordinates, result)
-
-                break
-
-            elif x == (limit + 1):
-                raise Exception("Could not find second lung wing")
-
-        return result
-
