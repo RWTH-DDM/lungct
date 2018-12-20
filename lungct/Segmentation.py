@@ -1,4 +1,5 @@
 
+import nibabel as nib
 import numpy as np
 
 
@@ -28,3 +29,10 @@ class Segmentation:
     def get_median_density(self):
 
         return np.nanmedian(self._data)
+
+    def nifti_export(self, target_file_path: str):
+
+        if not target_file_path.endswith('.nii'):
+            target_file_path += '.nii'
+
+        nib.save(nib.Nifti1Image(self.get_data(), np.eye(4)), target_file_path)
