@@ -1,9 +1,10 @@
 
+from lungct.floodfill import flood_fill
 import hashlib
 import nibabel as nib
 import numpy as np
 import os
-import segmentation
+import scipy.ndimage as img
 
 
 class LungCT:
@@ -35,7 +36,7 @@ class LungCT:
             if os.path.isfile(cache_file_path):
                 self._mask = np.load(cache_file_path)
             else:
-                self._mask = segmentation.get_lung_mask(self.get_scan())
+                self._mask = self._get_lung_mask(self.get_scan())
                 np.save(cache_file_path, self._mask)
 
         return self._mask
@@ -110,3 +111,53 @@ class LungCT:
     def get_median_density(self):
 
         return np.nanmedian(self.get_lung())
+
+    def _get_lung_mask(self, scan_data: np.array):
+
+        # Thresholding yields point cloud within lung volume
+        # Thresholds taken from https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0152505
+        segmentation = np.copy(scan_data)
+        segmentation[(-950 < segmentation) & (segmentation < -701)] = 1
+        segmentation[segmentation != 1] = 0
+
+        # Smoothing using gaussian kernel and 2nd threshold to get solid volumes
+        # todo: use otsu?
+        segmentation = img.filters.gaussian_filter(segmentation, sigma=3)
+        segmentation[segmentation > 0.1] = 1  # min 3 (3/27 =~ 0.11) lung-pixels per 3x3x3-cube
+        segmentation[segmentation != 1] = 0
+
+        # Use floodfilling to reduce mask to actual parts of the lung
+        # The filling is started on the two points where the central traverse axis first hits a thresholded area
+        shape = scan_data.shape
+        result = np.zeros(shape, bool)
+
+        limit = shape[2] - 1
+        for x in range(shape[2] // 2, limit):
+
+            coordinates = (shape[0] // 2, shape[1] // 2, x)
+
+            if segmentation[coordinates] == 1:
+                flood_fill(segmentation, coordinates, result)
+                break
+
+            elif x == (limit - 1):
+                raise Exception("Could not find first lung wing")
+
+        limit = 0
+        for x in range(shape[2] // 2, limit, -1):
+
+            coordinates = (shape[0] // 2, shape[1] // 2, x)
+
+            if segmentation[coordinates] == 1:
+
+                # only fill if not already found by first flooding
+                if not result[coordinates]:
+                    flood_fill(segmentation, coordinates, result)
+
+                break
+
+            elif x == (limit + 1):
+                raise Exception("Could not find second lung wing")
+
+        return result
+
