@@ -107,6 +107,13 @@ class LungCT:
 
         return masked_vessel.astype(bool)
 
+    def get_vessel(self) -> np.array:
+
+        masked_data = np.copy(self.get_scan())
+        masked_data[~self.get_vessel_mask()] = np.nan
+
+        return Segmentation(self, masked_data)
+
     def get_lung_without_vessels(self) -> Segmentation:
 
         lung_without_vessels = np.copy(self.get_lung().get_data())
