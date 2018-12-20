@@ -70,7 +70,7 @@ class LungCT:
 
         unit = header.get_xyzt_units()[0]
         unit_factors = {
-            'm': 0.000001,
+            'm': 0.001,
             'mm': 1.
         }
 
