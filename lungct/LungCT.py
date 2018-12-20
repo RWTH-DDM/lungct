@@ -1,6 +1,6 @@
 
 from lungct.floodfill import flood_fill
-import hashlib
+from lungct.NumpyCache import NumpyCache
 import nibabel as nib
 import numpy as np
 import os
@@ -9,14 +9,20 @@ import scipy.ndimage as img
 
 class LungCT:
 
-    _cache_path = os.path.dirname(__file__) + '/../cache/'
-
     def __init__(self, scan_file_path: str):
 
         self._scan_file_path = scan_file_path
         self._scan = nib.load(scan_file_path)
 
-        self._mask = None
+        self._numpy_cache = NumpyCache(
+            os.path.realpath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    '..',
+                    'cache'
+                )
+            )
+        )
 
     def get_scan(self) -> np.array:
 
@@ -28,18 +34,7 @@ class LungCT:
 
         """ Returns boolean mask array which is True for all voxels being part of the lung. """
 
-        if self._mask is None:
-
-            path_hash = hashlib.md5(self._scan_file_path.encode('utf-8')).hexdigest()
-            cache_file_path = LungCT._cache_path + path_hash + '.mask.npy'
-
-            if os.path.isfile(cache_file_path):
-                self._mask = np.load(cache_file_path)
-            else:
-                self._mask = self._get_lung_mask(self.get_scan())
-                np.save(cache_file_path, self._mask)
-
-        return self._mask
+        return self._numpy_cache.get_cached(self._get_lung_mask, self._scan_file_path, self.get_scan())
 
     def get_lung(self) -> np.array:
 
