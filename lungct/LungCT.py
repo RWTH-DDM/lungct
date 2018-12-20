@@ -19,9 +19,13 @@ class LungCT:
 
     def get_scan(self) -> np.array:
 
+        """ Returns the original scan. """
+
         return self._scan.get_fdata()
 
     def get_mask(self) -> np.array:
+
+        """ Returns boolean mask array which is True for all voxels being part of the lung. """
 
         if self._mask is None:
 
@@ -38,12 +42,16 @@ class LungCT:
 
     def get_lung(self) -> np.array:
 
+        """ Returns the original scan data being overlayed by the lung mask. """
+
         masked_data = np.copy(self.get_scan())
         masked_data[~self.get_mask()] = np.nan
 
         return masked_data
 
     def get_vessel_mask(self) -> np.array:
+
+        """ Returns boolean mask array which is True for all voxels being considered as blood vessels. """
 
         # Thresholding yields blood vessel point cloud within lung volume
         masked_vessel = np.copy(self.get_lung())
@@ -65,6 +73,8 @@ class LungCT:
         return np.count_nonzero(self.get_mask()) * self.get_voxel_volume() / 1000000.
 
     def get_voxel_volume(self) -> float:
+
+        """ Returns the volume of a single voxel within the scan in mm^3. """
 
         header = self._scan.get_header()
 
