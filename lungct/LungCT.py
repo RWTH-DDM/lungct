@@ -1,6 +1,7 @@
 
 from lungct.floodfill import flood_fill
 from lungct.NumpyCache import NumpyCache
+from lungct.Segmentation import Segmentation
 import nibabel as nib
 import numpy as np
 import os
@@ -85,37 +86,33 @@ class LungCT:
 
         return self._numpy_cache.get_cached(compute_mask, self._scan_file_path, self.get_scan())
 
-    def get_lung(self) -> np.array:
+    def get_lung(self) -> Segmentation:
 
         """ Returns the original scan data being overlayed by the lung mask. """
 
         masked_data = np.copy(self.get_scan())
         masked_data[~self.get_mask()] = np.nan
 
-        return masked_data
+        return Segmentation(self, masked_data)
 
     def get_vessel_mask(self) -> np.array:
 
         """ Returns boolean mask array which is True for all voxels being considered as blood vessels. """
 
         # Thresholding yields blood vessel point cloud within lung volume
-        masked_vessel = np.copy(self.get_lung())
+        masked_vessel = np.copy(self.get_lung().get_data())
         masked_vessel[np.isnan(masked_vessel)] = 0
         masked_vessel[(-590 < masked_vessel) & (masked_vessel < -400)] = 1
         masked_vessel[masked_vessel != 1] = 0
 
         return masked_vessel.astype(bool)
 
-    def get_lung_without_vessels(self) -> np.array:
+    def get_lung_without_vessels(self) -> Segmentation:
 
-        lung = np.copy(self.get_lung())
-        lung[self.get_vessel_mask()] = np.nan
+        lung_without_vessels = np.copy(self.get_lung().get_data())
+        lung_without_vessels[self.get_vessel_mask()] = np.nan
 
-        return lung
-
-    def get_volume(self) -> float:
-
-        return np.count_nonzero(self.get_mask()) * self.get_voxel_volume() / 1000000.
+        return Segmentation(self, lung_without_vessels)
 
     def get_voxel_volume(self) -> float:
 
@@ -143,15 +140,3 @@ class LungCT:
 
         # return volume in mm^3
         return abs(p[0] * p[1] * p[2])
-
-    def get_percentile_density(self, percentile: float) -> float:
-
-        return np.nanpercentile(self.get_lung(), percentile)
-
-    def get_average_density(self):
-
-        return np.nanmean(self.get_lung())
-
-    def get_median_density(self):
-
-        return np.nanmedian(self.get_lung())
