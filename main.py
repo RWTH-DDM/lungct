@@ -21,6 +21,7 @@ print("PD 5%%: %f" % lung_with_vessels.get_percentile_density(5))
 print("PD 95%%: %f" % lung_with_vessels.get_percentile_density(95))
 print("Average: %f" % lung_with_vessels.get_average_density())
 print("Median: %f" % lung_with_vessels.get_median_density())
+print("Density gradient: %s" % (lung_with_vessels.get_density_gradient(),))
 
 print("\nLung without vessels:")
 print("Volume: %f l" % lung_without_vessels.get_volume())
@@ -28,6 +29,7 @@ print("PD 5%%: %f" % lung_without_vessels.get_percentile_density(5))
 print("PD 95%%: %f" % lung_without_vessels.get_percentile_density(95))
 print("Average: %f" % lung_without_vessels.get_average_density())
 print("Median: %f" % lung_without_vessels.get_median_density())
+print("Density gradient: %s" % (lung_without_vessels.get_density_gradient(),))
 
 
 # Display result as central slice through the scan, the given segmentation and the computed segmentation
