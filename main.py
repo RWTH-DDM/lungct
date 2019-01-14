@@ -32,21 +32,26 @@ print("Median: %f" % lung_without_vessels.get_median_density())
 
 # Display result as central slice through the scan, the given segmentation and the computed segmentation
 print("\nDisplaying slices...")
-fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
+fig, [[ax11, ax12, ax13], [ax21, ax22, ax23]] = plt.subplots(nrows=2, ncols=3, figsize=(18, 12))
 
 scan_data = lungct.get_scan()
 height = scan_data.shape[0] // 2
 
-ax1.imshow(scan_data[height])
-ax1.set_title('Original image')
+ax11.imshow(scan_data[height])
+ax11.set_title('Original image')
 
-ax2.imshow(lungct.get_lung().get_data()[height])
-ax2.set_title('Masked image')
+ax12.imshow(lungct.get_mask()[height])
+ax12.set_title('Lung mask')
 
-ax3.imshow(lungct.get_vessel_mask()[height])
-ax3.set_title('Masked Vessels')
+ax13.imshow(lungct.get_lung().get_data()[height])
+ax13.set_title('Masked image')
 
-ax4.imshow(lungct.get_lung_without_vessels().get_data()[height])
-ax4.set_title('Lung Without Vessels')
+ax21.axis('off')
+
+ax22.imshow(lungct.get_vessel_mask()[height])
+ax22.set_title('Masked Vessels')
+
+ax23.imshow(lungct.get_lung_without_vessels().get_data()[height])
+ax23.set_title('Lung Without Vessels')
 
 fig.show()
