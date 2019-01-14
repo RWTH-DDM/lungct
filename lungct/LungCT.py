@@ -51,6 +51,7 @@ class LungCT:
 
             # Use floodfilling to reduce mask to actual parts of the lung
             # The filling is started on the two points where the central traverse axis first hits a thresholded area
+            # todo: ensure correct direction by normalizing scan data using nifti header information
             shape = scan_data.shape
             result = np.zeros(shape, bool)
 
