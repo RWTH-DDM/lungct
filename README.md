@@ -11,3 +11,9 @@ $ cd lungct
 $ pipenv sync
 $ python main.py
 ```
+
+## Running tests
+
+```
+$ python -m unittest
+```
