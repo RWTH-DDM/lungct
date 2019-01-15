@@ -1,7 +1,7 @@
 
 import lungct.data as data
 import matplotlib.pyplot as plt
-from LungCT import LungCT
+from lungct.LungCT import LungCT
 
 
 lungct = LungCT(data.get_image_path('0002'))

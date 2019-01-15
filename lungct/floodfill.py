@@ -1,5 +1,5 @@
 
-import neighbourhood
+import lungct.neighbourhood as neighbourhood
 import numpy as np
 
 
