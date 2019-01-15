@@ -1,6 +1,6 @@
 
 import unittest
-import neighbourhood as nh
+import lungct.neighbourhood as nh
 
 
 class TestNeighbourhood3D(unittest.TestCase):
