@@ -13,7 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 Things you need to install the software and how to install them
 
 ```
-Dependencies are installed via pip, hence Python 3.6
+Dependencies are installed via pip, hence follow installation instruction for Python 3.6 from Official Python Website.
 
 ```
 
@@ -22,7 +22,7 @@ Dependencies are installed via pip, hence Python 3.6
 A step by step series of examples that tell you how to get a development env running
 
 ```
-git clone repo
+git clone git@github.com:RWTH-DDM/lungct.git
 
 
 ```
