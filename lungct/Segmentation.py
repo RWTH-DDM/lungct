@@ -1,7 +1,7 @@
 
 import nibabel as nib
 import numpy as np
-from scipy import ndimage
+from scipy import ndimage, spatial
 
 
 class Segmentation:
@@ -71,6 +71,26 @@ class Segmentation:
         )
 
         return gradient
+
+    def get_distances_to_nearest(self, other_segmentation) -> np.array:
+
+        """ Computes the minimal distance from each point of this segmentation to the nearest point of the given
+        segmentation. Returns array of distances in mm. """
+
+        indices = np.argwhere(~np.isnan(other_segmentation.get_data()))
+        tree = spatial.KDTree(indices)
+
+        src = np.argwhere(~np.isnan(self.get_mask()))
+
+        # todo: parallize code or use approximative method and remove limit
+        # see: https://scipy-cookbook.readthedocs.io/items/KDTree_example.html
+        # see: https://github.com/gieseke/bufferkdtree
+        src = src[:10000]
+        distances, _ = tree.query(src)
+
+        # todo: map coordinate-distance to spatial distance. currently assumes mm
+
+        return distances
 
     def nifti_export(self, target_file_path: str):
 

@@ -32,9 +32,13 @@ print("Median: %f" % lung_without_vessels.get_median_density())
 print("Density gradient: %s" % (lung_without_vessels.get_density_gradient(),))
 
 
+print("\nComputing distances...")
+to_vessel_distances = lung_without_vessels.get_distances_to_nearest(vessels)
+
+
 # Display result as central slice through the scan, the given segmentation and the computed segmentation
 print("\nDisplaying slices...")
-fig, [[ax11, ax12, ax13], [ax21, ax22, ax23]] = plt.subplots(nrows=2, ncols=3, figsize=(18, 12))
+fig, [[ax11, ax12, ax13], [ax21, ax22, ax23], [ax31, ax32, ax33]] = plt.subplots(nrows=3, ncols=3, figsize=(18, 12))
 
 scan_data = lungct.get_scan()
 height = scan_data.shape[0] // 2
@@ -55,5 +59,10 @@ ax22.set_title('Masked Vessels')
 
 ax23.imshow(lungct.get_lung_without_vessels().get_data()[height])
 ax23.set_title('Lung Without Vessels')
+
+ax31.hist(to_vessel_distances)
+
+ax32.axis('off')
+ax33.axis('off')
 
 fig.show()
