@@ -82,7 +82,7 @@ class Segmentation:
 
         src = np.argwhere(~np.isnan(self.get_mask()))
 
-        # todo: parallize code or use approximative method and remove limit
+        # todo: parallelize code or use approximative method and remove limit
         # see: https://scipy-cookbook.readthedocs.io/items/KDTree_example.html
         # see: https://github.com/gieseke/bufferkdtree
         src = src[:10000]
