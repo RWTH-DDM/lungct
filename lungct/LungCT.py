@@ -101,9 +101,10 @@ class LungCT:
         """ Returns boolean mask array which is True for all voxels being considered as blood vessels. """
 
         # Thresholding yields blood vessel point cloud within lung volume
+        # large vessels have a HU value between -200 and +70, smallest vessels can have values of up to -570 (currently excluded due to noise)
         masked_vessel = np.copy(self.get_lung().get_data())
         masked_vessel[np.isnan(masked_vessel)] = 0
-        masked_vessel[(-590 < masked_vessel) & (masked_vessel < -400)] = 1
+        masked_vessel[(-500 < masked_vessel) & (masked_vessel < 70)] = 1
         masked_vessel[masked_vessel != 1] = 0
 
         return masked_vessel.astype(bool)
