@@ -31,7 +31,15 @@ class LungCT:
 
         """ Returns the original scan. """
 
-        return self._scan.get_fdata()
+        data = self._scan.get_fdata()
+
+        # Returns Data by converting Pixel Intensities into Houndsfield Unit
+        slope, intercept = self._scan.get_header().get_slope_inter()
+        if slope is not None and intercept is not None:
+            data = slope * data
+            data += intercept
+
+        return data
 
     def get_mask(self) -> np.array:
 
