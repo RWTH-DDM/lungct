@@ -203,7 +203,7 @@ class LungCT:
 
         mask_coordinates = np.argwhere(data)
 
-        kmeans = KMeans(n_clusters=2, init=estimated_centers)
+        kmeans = KMeans(n_clusters=2, init=estimated_centers, n_init=1)
         labels = kmeans.fit_predict(mask_coordinates)
 
         left_coordinates = mask_coordinates[labels == 0]
