@@ -6,6 +6,8 @@ import nibabel as nib
 import numpy as np
 import os
 import scipy.ndimage as img
+from sklearn.cluster import KMeans
+from typing import Tuple
 
 
 class LungCT:
@@ -96,6 +98,14 @@ class LungCT:
 
         return Segmentation(self, masked_data)
 
+    def get_left_lung_wing(self) -> Segmentation:
+
+        return self._get_masked_data(self._get_lung_wing_masks()[0])
+
+    def get_right_lung_wing(self) -> Segmentation:
+
+        return self._get_masked_data(self._get_lung_wing_masks()[1])
+
     def get_vessel_mask(self) -> np.array:
 
         """ Returns boolean mask array which is True for all voxels being considered as blood vessels. """
@@ -149,3 +159,59 @@ class LungCT:
 
         # return volume in mm^3
         return abs(p[0] * p[1] * p[2])
+
+    def _get_masked_data(self, mask: np.array) -> Segmentation:
+
+        masked_data = np.copy(self.get_scan())
+        masked_data[~mask] = np.nan
+
+        return Segmentation(self, masked_data)
+
+    def _get_lung_wing_masks(self) -> Tuple[np.array, np.array]:
+        """
+        Computes and returns a tuple consisting of masks for both the left and the right lung wing.
+
+        Returns
+        -------
+        masks : tuple
+            The two masks as a tuple.
+        """
+
+        data = self.get_mask()
+        shape = data.shape
+
+        estimated_centers = np.array([
+            [
+                shape[0] // 2,
+                shape[1] // 2,
+                shape[2] // 3,
+            ],
+            [
+                shape[0] // 2,
+                shape[1] // 2,
+                shape[2] // 3 * 2,
+            ]
+        ])
+
+        mask_coordinates = np.argwhere(data)
+
+        kmeans = KMeans(n_clusters=2, init=estimated_centers)
+        labels = kmeans.fit_predict(mask_coordinates)
+
+        left_coordinates = mask_coordinates[labels == 0]
+        left_mask = np.zeros_like(data)
+        left_mask[
+            left_coordinates[:, 0],
+            left_coordinates[:, 1],
+            left_coordinates[:, 2]
+        ] = True
+
+        right_coordinates = mask_coordinates[labels == 1]
+        right_mask = np.zeros_like(data)
+        right_mask[
+            right_coordinates[:, 0],
+            right_coordinates[:, 1],
+            right_coordinates[:, 2]
+        ] = True
+
+        return left_mask, right_mask

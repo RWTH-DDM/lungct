@@ -8,5 +8,6 @@ numpy = "*"
 matplotlib = "*"
 nibabel = "*"
 scipy = "*"
+scikit-learn = "*"
 
 [dev-packages]
