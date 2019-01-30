@@ -23,6 +23,18 @@ class Segmentation:
 
         return mask
 
+    def get_shell(self, width: float = 1.):
+
+        mask = ndimage.filters.gaussian_filter(self.get_mask(), sigma=width)
+        mask[(mask == 1) | (mask == 0)] = 0
+        mask[mask != 0] = 1
+        mask = mask.astype(bool)
+
+        data = np.copy(self.get_data())
+        data[~mask] = np.nan
+
+        return Segmentation(self._lungct, data)
+
     def get_centroid(self, variant: str = 'mean') -> tuple:
 
         coordinates = np.argwhere(~np.isnan(self._data))
