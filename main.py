@@ -15,6 +15,7 @@ def show_slice(data, points=None):
 
     fig.show()
 
+
 def show_three_slices(data, points=None):
 
     fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18, 6))
@@ -36,6 +37,7 @@ def show_three_slices(data, points=None):
 
     fig.show()
 
+
 def show_distribution(data):
 
     fig, axis = plt.subplots(fig=(6, 6))
@@ -46,7 +48,7 @@ def show_distribution(data):
 lungct = LungCT(data.get_image_path('0002'))
 lung_with_vessels = lungct.get_lung()
 lung_without_vessels = lungct.get_lung_without_vessels()
-vessels = lungct.get_vessel()
+vessels = lungct.get_vessels()
 
 # export segmentations
 print("Exporting segmentations...")
@@ -73,4 +75,4 @@ print("Density gradient: %s" % (lung_without_vessels.get_density_gradient(),))
 
 show_three_slices(lungct.get_scan())
 show_three_slices(lungct.get_lung().get_data())
-show_three_slices(lungct.get_vessel().get_data())
+show_three_slices(lungct.get_vessels().get_data())

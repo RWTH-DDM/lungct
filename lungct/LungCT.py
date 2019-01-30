@@ -41,7 +41,7 @@ class LungCT:
 
         return data
 
-    def get_mask(self) -> np.array:
+    def get_lung_mask(self) -> np.array:
 
         """ Returns boolean mask array which is True for all voxels being part of the lung. """
 
@@ -101,10 +101,7 @@ class LungCT:
 
         """ Returns the original scan data being overlayed by the lung mask. """
 
-        masked_data = np.copy(self.get_scan())
-        masked_data[~self.get_mask()] = np.nan
-
-        return Segmentation(self, masked_data)
+        return self._get_masked_data(self.get_lung_mask())
 
     def get_left_lung_wing(self) -> Segmentation:
 
@@ -127,19 +124,13 @@ class LungCT:
 
         return masked_vessel.astype(bool)
 
-    def get_vessel(self) -> np.array:
+    def get_vessels(self) -> Segmentation:
 
-        masked_data = np.copy(self.get_scan())
-        masked_data[~self.get_vessel_mask()] = np.nan
-
-        return Segmentation(self, masked_data)
+        return self._get_masked_data(self.get_vessel_mask())
 
     def get_lung_without_vessels(self) -> Segmentation:
 
-        lung_without_vessels = np.copy(self.get_lung().get_data())
-        lung_without_vessels[self.get_vessel_mask()] = np.nan
-
-        return Segmentation(self, lung_without_vessels)
+        return self._get_masked_data(self.get_vessel_mask() ^ self.get_lung_mask())
 
     def get_voxel_volume(self) -> float:
 
@@ -185,7 +176,7 @@ class LungCT:
             The two masks as a tuple.
         """
 
-        data = self.get_mask()
+        data = self.get_lung_mask()
         shape = data.shape
 
         estimated_centers = np.array([
