@@ -23,11 +23,12 @@ class Segmentation:
 
         return mask
 
-    def get_centroid(self, type='com') -> tuple:
+    def get_centroid(self, variant: str = 'mean') -> tuple:
 
         coordinates = np.argwhere(~np.isnan(self._data))
 
-        if type == 'com':
+        # mean coordinates
+        if variant == 'mean':
 
             length = coordinates.shape[0]
 
@@ -37,12 +38,29 @@ class Segmentation:
                 np.sum(coordinates[:, 2]) / length
             )
 
-        elif type == 'median':
+        # center-of-mass
+        elif variant == 'com':
+
+            # todo: implement
+
+            raise NotImplemented()
+
+        # median coordinates
+        elif variant == 'median':
 
             return (
                 np.median(coordinates[:, 0]),
                 np.median(coordinates[:, 1]),
                 np.median(coordinates[:, 2])
+            )
+
+        # middle coordinates
+        elif variant == 'middle':
+
+            return (
+                (np.min(coordinates[:, 0]) + np.max(coordinates[:, 0])) / 2,
+                (np.min(coordinates[:, 1]) + np.max(coordinates[:, 1])) / 2,
+                (np.min(coordinates[:, 2]) + np.max(coordinates[:, 2])) / 2
             )
 
         else:
