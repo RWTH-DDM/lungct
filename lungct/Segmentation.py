@@ -23,6 +23,32 @@ class Segmentation:
 
         return mask
 
+    def get_centroid(self, type='com') -> tuple:
+
+        coordinates = np.argwhere(~np.isnan(self._data))
+
+        if type == 'com':
+
+            length = coordinates.shape[0]
+
+            return (
+                np.sum(coordinates[:, 0]) / length,
+                np.sum(coordinates[:, 1]) / length,
+                np.sum(coordinates[:, 2]) / length
+            )
+
+        elif type == 'median':
+
+            return (
+                np.median(coordinates[:, 0]),
+                np.median(coordinates[:, 1]),
+                np.median(coordinates[:, 2])
+            )
+
+        else:
+
+            raise ValueError()
+
     def get_volume(self) -> float:
 
         return (self._data.size - np.count_nonzero(np.isnan(self._data))) * self._lungct.get_voxel_volume() / 1000000.
