@@ -4,6 +4,45 @@ import matplotlib.pyplot as plt
 from lungct.LungCT import LungCT
 
 
+def show_slice(data, points=None):
+
+    fig, ax = plt.subplots()
+    ax.imshow(data[data.shape[0] // 2])
+
+    if points:
+        for point in points:
+            ax.plot(point[0], point[1], 'ro')
+
+    fig.show()
+
+def show_three_slices(data, points=None):
+
+    fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(18, 6))
+
+    shape = data.shape
+
+    ax1.imshow(data[:, :, shape[2] // 2])
+    ax1.set_title('X-plane')
+
+    ax2.imshow(data[:, shape[1] // 2, :])
+    ax2.set_title('Y-plane')
+
+    ax3.imshow(data[shape[0] // 2, :, :])
+    ax3.set_title('Z-plane')
+
+    """if points:
+        for point in points:
+            ax1.plot(point[])"""
+
+    fig.show()
+
+def show_distribution(data):
+
+    fig, axis = plt.subplots(fig=(6, 6))
+    axis.hist(data)
+    fig.show()
+
+
 lungct = LungCT(data.get_image_path('0002'))
 lung_with_vessels = lungct.get_lung()
 lung_without_vessels = lungct.get_lung_without_vessels()
@@ -32,37 +71,6 @@ print("Median: %f" % lung_without_vessels.get_median_density())
 print("Density gradient: %s" % (lung_without_vessels.get_density_gradient(),))
 
 
-print("\nComputing distances...")
-to_vessel_distances = lung_without_vessels.get_distances_to_nearest(vessels)
-
-
-# Display result as central slice through the scan, the given segmentation and the computed segmentation
-print("\nDisplaying slices...")
-fig, [[ax11, ax12, ax13], [ax21, ax22, ax23], [ax31, ax32, ax33]] = plt.subplots(nrows=3, ncols=3, figsize=(18, 12))
-
-scan_data = lungct.get_scan()
-height = scan_data.shape[0] // 2
-
-ax11.imshow(scan_data[height])
-ax11.set_title('Original image')
-
-ax12.imshow(lungct.get_mask()[height])
-ax12.set_title('Lung mask')
-
-ax13.imshow(lungct.get_lung().get_data()[height])
-ax13.set_title('Masked image')
-
-ax21.axis('off')
-
-ax22.imshow(lungct.get_vessel_mask()[height])
-ax22.set_title('Masked Vessels')
-
-ax23.imshow(lungct.get_lung_without_vessels().get_data()[height])
-ax23.set_title('Lung Without Vessels')
-
-ax31.hist(to_vessel_distances)
-
-ax32.axis('off')
-ax33.axis('off')
-
-fig.show()
+show_three_slices(lungct.get_scan())
+show_three_slices(lungct.get_lung().get_data())
+show_three_slices(lungct.get_vessel().get_data())
