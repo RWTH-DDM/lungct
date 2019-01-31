@@ -2,6 +2,8 @@
 from lungct.floodfill import flood_fill
 from lungct.NumpyCache import NumpyCache
 from lungct.Segmentation import Segmentation
+from nibabel.affines import apply_affine
+import math
 import nibabel as nib
 import numpy as np
 import os
@@ -158,6 +160,47 @@ class LungCT:
 
         # return volume in mm^3
         return abs(p[0] * p[1] * p[2])
+
+    def _get_regularized_data(self, data):
+
+        # Transform data into regular grid
+        # caution: this distorts the affine of the scan
+        # todo: calculate largest common divisor of original voxel dimensions (with error margin) to be used as the new voxel cube side length
+        # todo: update voxel volume calculation
+
+        shape = data.shape
+        affine = self._scan.get_affine()
+        zero = apply_affine(affine, [(0, 0, 0)])[0]
+        extreme_x_1 = zero[2]
+        extreme_x_2 = apply_affine(affine, [(0, 0, shape[2])])[0][2]
+        extreme_y_1 = zero[1]
+        extreme_y_2 = apply_affine(affine, [(0, shape[1], 0)])[0][1]
+        extreme_z_1 = zero[0]
+        extreme_z_2 = apply_affine(affine, [(shape[0], 0, 0)])[0][0]
+        x_size = abs(extreme_x_1 - extreme_x_2)
+        y_size = abs(extreme_y_1 - extreme_y_2)
+        z_size = abs(extreme_z_1 - extreme_z_2)
+        offset = (
+            0 - min(extreme_z_1, extreme_z_2),
+            0 - min(extreme_y_1, extreme_y_2),
+            0 - min(extreme_x_1, extreme_x_2)
+        )
+        array_shape = (
+            math.ceil(z_size),
+            math.ceil(y_size),
+            math.ceil(x_size)
+        )
+        regular_data = np.full(array_shape, np.nan, np.float)
+        for index, value in np.ndenumerate(data):
+            regular_coordinates = apply_affine(affine, [index])[0]
+            regular_index = (
+                math.floor(regular_coordinates[0] + offset[0]),
+                math.floor(regular_coordinates[1] + offset[1]),
+                math.floor(regular_coordinates[2] + offset[2])
+            )
+            regular_data[regular_index] = value
+
+        return regular_data
 
     def _get_masked_data(self, mask: np.array) -> Segmentation:
 
